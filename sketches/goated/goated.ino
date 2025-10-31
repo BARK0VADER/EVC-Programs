@@ -92,11 +92,17 @@ void loop() {
           // Get pack current, pack voltage
           if (message.id == 0x03B) {
             // Get pack current - unsure of the logic here
-            for (int i = 0; i < 2; i++) {
-              int tmpByte = message.data[i];
-              packCurrent = tmpByte * (pow(256, 1 - i));
-              packCurrent /= 10;
-            }
+            // for (int i = 0; i < 2; i++) {
+            //   int tmpByte = message.data[i];
+            //   // Dump hex values before being transformed
+            //   // Hex value prints as 308, need 30.8
+            //   Serial.print(tmpByte, HEX);
+            //   packCurrent = tmpByte * (pow(256, 1 - i));
+            //   packCurrent = tmpByte / 10;
+            // }
+            packCurrent = ((unsigned int)message.data[0] << 8) | message.data[1];
+            packCurrent /= 10;
+            Serial.println();
             // Get pack voltage - is being sent as 2 bytes
             packVoltage = ((unsigned int)message.data[2] << 8) | message.data[3];
             packVoltage /= 10; // Must be done separately to get the decimal value
