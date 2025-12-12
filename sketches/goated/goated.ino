@@ -55,6 +55,8 @@ void setup() {
     Serial.print("ERROR: Initializing SD card failed. Check if present.");
     while(1); // Hang
   }
+  // TODO: Print headers for the CSV outputted
+
   // Initialize LCD
   Wire.begin();
   lcd.begin(Wire);
@@ -86,8 +88,11 @@ void loop() {
 
       // Get CAN bus messages
       tCAN message;
+      Serial.println("Checking for a message...");
       if (mcp2515_check_message()) {
+        Serial.println("Message checked...");
         if (mcp2515_get_message(&message)) {
+          Serial.println("We received a message.");
           // Wait to get data to prevent using stale data
           // Get pack current, pack voltage
           if (message.id == 0x03B) {
@@ -100,11 +105,11 @@ void loop() {
             //   packCurrent = tmpByte * (pow(256, 1 - i));
             //   packCurrent = tmpByte / 10;
             // }
-            packCurrent = ((unsigned int)message.data[0] << 8) | message.data[1];
+            packCurrent = ((int)message.data[0] << 8) | message.data[1];
             packCurrent /= 10;
             Serial.println();
             // Get pack voltage - is being sent as 2 bytes
-            packVoltage = ((unsigned int)message.data[2] << 8) | message.data[3];
+            packVoltage = ((int)message.data[2] << 8) | message.data[3];
             packVoltage /= 10; // Must be done separately to get the decimal value
           }
           // Get battery temp, lowest cell ID, lowest cell voltage
